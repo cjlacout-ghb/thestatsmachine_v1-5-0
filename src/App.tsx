@@ -467,6 +467,10 @@ function App() {
             setActiveTournament(t);
             setActiveTab('games');
           }}
+          onManageTournament={(t) => {
+            setActiveTournament(t);
+            setActiveTab('tournaments');
+          }}
           onSwitchTeam={() => setActiveTeam(null)}
         />
 
@@ -484,7 +488,7 @@ function App() {
               <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                 {activeTab === 'players' ? 'Jugadores' :
                   activeTab === 'team' ? 'Resumen de Equipo' :
-                    activeTab === 'stats' ? 'Estadísticas' :
+                    activeTab === 'stats' ? (activeTournament ? 'Estadísticas de Equipo' : 'Estadísticas Individuales') :
                       activeTab === 'tournaments' ? 'Eventos y Torneos' :
                         'Registro de Partidos'}
               </span>
@@ -495,8 +499,8 @@ function App() {
             <h2 className="text-bold" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
               <span>
                 {activeTab === 'players' ? 'Jugadores' :
-                  activeTab === 'team' ? 'Equipo' :
-                    activeTab === 'stats' ? 'Estadísticas' :
+                  activeTab === 'team' ? 'Resumen de Equipo' :
+                    activeTab === 'stats' ? (activeTournament ? 'Estadísticas de Equipo' : 'Estadísticas Individuales') :
                       activeTab === 'tournaments' ? 'Eventos y Torneos' :
                         'Partidos'}
               </span>

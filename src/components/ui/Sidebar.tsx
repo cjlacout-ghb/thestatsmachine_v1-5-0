@@ -9,6 +9,7 @@ interface SidebarProps {
     onExitTournament: () => void;
     tournaments?: Tournament[];
     onSelectTournament?: (t: Tournament) => void;
+    onManageTournament?: (t: Tournament) => void;
     onSwitchTeam: () => void;
 }
 
@@ -20,9 +21,11 @@ export function Sidebar({
     onExitTournament, 
     tournaments = [], 
     onSelectTournament,
+    onManageTournament,
     onSwitchTeam
 }: SidebarProps) {
     const [expandedAccordion, setExpandedAccordion] = useState<string | null>(null);
+    const [isManageOpen, setIsManageOpen] = useState(false);
 
     // Sync expanded accordion with active tournament
     useEffect(() => {
@@ -30,6 +33,15 @@ export function Sidebar({
             setExpandedAccordion(activeTournament.id);
         }
     }, [activeTournament]);
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = () => setIsManageOpen(false);
+        if (isManageOpen) {
+            window.addEventListener('click', handleClickOutside);
+        }
+        return () => window.removeEventListener('click', handleClickOutside);
+    }, [isManageOpen]);
 
     const toggleAccordion = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -63,7 +75,7 @@ export function Sidebar({
                         onClick={() => { onExitTournament(); setActiveTab('team'); }}
                     >
                         <span className="icon">🏢</span>
-                        <span>Resumen</span>
+                        <span>Resumen de Equipo</span>
                     </button>
                     <button
                         className={`sidebar-item ${activeTab === 'players' && !activeTournament ? 'active' : ''}`}
@@ -77,7 +89,7 @@ export function Sidebar({
                         onClick={() => { onExitTournament(); setActiveTab('stats'); }}
                     >
                         <span className="icon">📊</span>
-                        <span>Estadísticas Globales</span>
+                        <span>Estadísticas Individuales</span>
                     </button>
                 </nav>
             </div>
@@ -89,14 +101,50 @@ export function Sidebar({
                 <h3 className="sidebar-header" style={{ marginLeft: 'var(--space-sm)' }}>TORNEOS</h3>
                 
                 <nav className="sidebar-nav">
-                    {/* The "All Events" view */}
-                    <button
-                        className={`sidebar-item ${activeTab === 'tournaments' && !activeTournament ? 'active' : ''}`}
-                        onClick={() => { onExitTournament(); setActiveTab('tournaments'); }}
-                    >
-                        <span className="icon">🏆</span>
-                        <span>Administrar Torneos</span>
-                    </button>
+                    {/* The "Selector de Contexto" for Administration */}
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            className={`sidebar-item ${isManageOpen ? 'active' : ''} ${activeTab === 'tournaments' && !activeTournament ? 'active' : ''}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsManageOpen(!isManageOpen);
+                            }}
+                        >
+                            <span className="icon">🏆</span>
+                            <span>Administrar Torneos</span>
+                            <span className={`chevron ${isManageOpen ? 'rotated' : ''}`} style={{ marginLeft: 'auto' }}>▾</span>
+                        </button>
+
+                        {isManageOpen && (
+                            <div className="sidebar-dropdown-menu" onClick={e => e.stopPropagation()}>
+                                <button 
+                                    className="dropdown-item" 
+                                    onClick={() => {
+                                        onExitTournament();
+                                        setActiveTab('tournaments');
+                                        setIsManageOpen(false);
+                                    }}
+                                >
+                                    <span className="icon">📑</span>
+                                    <span>Ver Resumen General</span>
+                                </button>
+                                <div className="dropdown-divider"></div>
+                                {tournaments.map(t => (
+                                    <button 
+                                        key={t.id} 
+                                        className="dropdown-item"
+                                        onClick={() => {
+                                            if (onManageTournament) onManageTournament(t);
+                                            setIsManageOpen(false);
+                                        }}
+                                    >
+                                        <span className="icon">🏆</span>
+                                        <span className="text-truncate">{t.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     {/* Accordions per Tournament */}
                     <div className="tournaments-accordion-list">
@@ -146,7 +194,7 @@ export function Sidebar({
                                             >
                                                 <div className="tree-line"></div>
                                                 <span className="dot"></span>
-                                                <span>Estadísticas</span>
+                                                <span>Estadísticas de Equipo</span>
                                             </button>
                                         </div>
                                     )}

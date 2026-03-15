@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Game, Player, Tournament, Team } from '../../types';
 import { calcBatting, calcPitching, calcFielding, formatAvg, formatERA, formatWHIP, formatIP, parseIP, getAvgLevel, getERALevel, getFldLevel } from '../../lib/calculations';
 import { StatTable } from '../ui/StatTable';
@@ -16,6 +16,7 @@ interface StatsTabProps {
     activeTeamName?: string;
     onAddGame?: () => void;
     onAddPlayer?: () => void;
+    initialView?: StatsView;
 }
 
 interface TeamStandingRow {
@@ -55,8 +56,12 @@ interface PlayerFieldingRow {
     cCS?: number; cSB?: number;
 }
 
-export function StatsTab({ games, players, teams, tournaments, tournament, activeTeamName = 'Mi Equipo', onAddGame, onAddPlayer }: StatsTabProps) {
-    const [view, setView] = useState<StatsView>(tournament ? 'standings' : 'batting');
+export function StatsTab({ games, players, teams, tournaments, tournament, activeTeamName = 'Mi Equipo', onAddGame, onAddPlayer, initialView }: StatsTabProps) {
+    const [view, setView] = useState<StatsView>(initialView || (tournament ? 'standings' : 'batting'));
+
+    useEffect(() => {
+        setView(initialView || (tournament ? 'standings' : 'batting'));
+    }, [initialView, tournament]);
 
     // ── Build standings rows ────────────────────────────────────────────────
     const standingsData: TeamStandingRow[] = useMemo(() => {

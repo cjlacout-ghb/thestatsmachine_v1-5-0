@@ -11,7 +11,7 @@ interface TournamentsTabProps {
     onEditTournament: (t: Tournament) => void;
     onDeleteTournament: (t: Tournament) => void;
     onAddGameToTournament: (t: Tournament) => void;
-    onViewStats: (t: Tournament) => void;
+    onViewStats: (t: Tournament, defaultView?: 'standings' | 'batting') => void;
 }
 
 export function TournamentsTab({
@@ -80,11 +80,11 @@ export function TournamentsTab({
                                     borderTop: '1px solid var(--border-light)',
                                     paddingTop: 'var(--space-lg)'
                                 }}>
-                                    <button className="btn btn-secondary btn-sm" style={{ flex: 1, padding: '0.5rem' }} onClick={(e) => { e.stopPropagation(); onViewStats(t); }}>
-                                        🏆 Posiciones
+                                    <button className="btn btn-secondary btn-sm" style={{ flex: 1, padding: '0.5rem' }} onClick={(e) => { e.stopPropagation(); onViewStats(t, 'standings'); }}>
+                                        🏆 Estadísticas de Equipo
                                     </button>
-                                    <button className="btn btn-secondary btn-sm" style={{ flex: 1, padding: '0.5rem' }} onClick={(e) => { e.stopPropagation(); onViewStats(t); }}>
-                                        📈 Stats Jugadores
+                                    <button className="btn btn-secondary btn-sm" style={{ flex: 1, padding: '0.5rem' }} onClick={(e) => { e.stopPropagation(); onViewStats(t, 'batting'); }}>
+                                        📈 Estadísticas Individuales
                                     </button>
                                 </div>
                             </div>

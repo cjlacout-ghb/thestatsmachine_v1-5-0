@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Team, Tournament, Player, Game, AppData, TabId } from '../../types';
 import { PlayersTab } from '../tabs/PlayersTab';
 import { TournamentsTab } from '../tabs/TournamentsTab';
@@ -56,6 +57,7 @@ export function AppContent({
     onDeleteGame,
     onOpenPlayerStats
 }: AppContentProps) {
+    const [statsPreselectedView, setStatsPreselectedView] = useState<'standings' | 'batting'>('standings');
 
     const renderTab = () => {
         switch (activeTab) {
@@ -86,9 +88,18 @@ export function AppContent({
                             onSetActiveTournament(t);
                             onAddGame(t);
                         }}
-                        onViewStats={(t) => {
-                            onSetActiveTournament(t);
-                            onSetActiveTab('stats');
+                        onViewStats={(t, defaultView = 'standings') => {
+                            if (defaultView === 'batting') {
+                                // "Estadísticas Individuales" → team-level stats (no tournament context)
+                                setStatsPreselectedView('batting');
+                                onSetActiveTournament(null);
+                                onSetActiveTab('stats');
+                            } else {
+                                // "Estadísticas de Equipo" → tournament standings
+                                setStatsPreselectedView('standings');
+                                onSetActiveTournament(t);
+                                onSetActiveTab('stats');
+                            }
                         }}
                     />
                 );
@@ -132,6 +143,7 @@ export function AppContent({
                         activeTeamName={activeTeam?.name}
                         onAddGame={onAddGame}
                         onAddPlayer={onAddPlayer}
+                        initialView={statsPreselectedView}
                     />
                 );
             default:
